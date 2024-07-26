@@ -1,52 +1,108 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { RiSendPlane2Line } from "react-icons/ri";
 import { Auth } from "~/app/_features/loaders";
 import { cn } from "~/lib/utils";
 
 export function Chat({ user }: Readonly<{ user: Auth["data"] }>) {
-  const [datas, setData] = useState(apiJsonMockup);
+  const [datas, setDatas] = useState(apiJsonMockup);
+  const [message, setMessage] = useState("");
+  const [hasNewMessage, setHasNewMessage] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (message.trim() === "") return;
+
+    const newMessage = {
+      id: Date.now(),
+      type: "text",
+      message: message,
+      sender: user.id,
+    };
+
+    setDatas((prevData) => ({
+      ...prevData,
+      results: {
+        ...prevData.results,
+        comments: [...prevData.results.comments, newMessage],
+      },
+    }));
+
+    setMessage("");
+  };
+
+  useEffect(() => {
+    setHasNewMessage(true);
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      setHasNewMessage(false);
+    }
+  }, [datas.results.comments]);
 
   return (
-    <div className="space-y-4 py-6 overflow-auto">
-      {datas.results.comments.map((comment, index) => (
-        <div
-          key={index}
-          className={cn(
-            "flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm mx-4",
-            comment.sender === "agent@mail.com" ||
-              comment.sender === "admin@mail.com"
-              ? "ml-auto bg-primary text-primary-foreground"
-              : "bg-muted"
-          )}
-        >
-          {comment.type === "text" && <p>{comment.message}</p>}
-          {comment.type === "image" && (
-            <img
-              src={comment.message}
-              alt={comment.sender}
-              className="rounded-lg"
-              style={{ maxWidth: "100%", height: "auto" }}
-            />
-          )}
-          {comment.type === "video" && (
-            <video controls className="rounded-lg max-w-[400px]">
-              <source src={comment.message} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
-          {comment.type === "pdf" && (
-            <a
-              href={comment.message}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              View PDF
-            </a>
-          )}
-        </div>
-      ))}
+    <div className="flex flex-col h-full">
+      <div className="flex-grow space-y-4 py-6 overflow-auto">
+        {datas.results.comments.map((comment, index) => (
+          <div
+            key={index}
+            className={cn(
+              "flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm mx-4",
+              comment.sender === "agent@mail.com" ||
+                comment.sender === "admin@mail.com"
+                ? "ml-auto bg-primary text-primary-foreground"
+                : "bg-muted"
+            )}
+          >
+            {comment.type === "text" && <p>{comment.message}</p>}
+            {comment.type === "image" && (
+              <img
+                src={comment.message}
+                alt={comment.sender}
+                className="rounded-lg"
+                style={{ maxWidth: "100%", height: "auto" }}
+              />
+            )}
+            {comment.type === "video" && (
+              <video controls className="rounded-lg max-w-[400px]">
+                <source src={comment.message} type="video/mp4" />
+                <track kind="captions" src="" srcLang="en" label="English" />
+                Your browser does not support the video tag.
+              </video>
+            )}
+            {comment.type === "pdf" && (
+              <a
+                href={comment.message}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                View PDF
+              </a>
+            )}
+          </div>
+        ))}
+        <div ref={chatEndRef}></div>
+      </div>
+      {hasNewMessage && (
+        <div className="new-message-indicator">New message!</div>
+      )}
+      <form
+        onSubmit={handleSendMessage}
+        className="sticky bottom-0 flex items-center p-4 border-t bg-white"
+      >
+        <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className="flex-grow p-2 border rounded-lg"
+          placeholder="Type your message..."
+        />
+        <button type="submit" className="p-4 rounded-lg">
+          <RiSendPlane2Line className="size-7" />
+        </button>
+      </form>
     </div>
   );
 }
