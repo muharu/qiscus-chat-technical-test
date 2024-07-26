@@ -1,11 +1,11 @@
-import { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getAuth } from "~/app/_features/loaders";
 import { ChatChannelCard } from "./_components/chat-channel-card";
 
-export const metadata: Metadata = {
-  title: "Simple Chat",
-};
+export default async function Home() {
+  const user = await getAuth();
+  if (!user) redirect("/");
 
-export default function Home() {
   return (
     <main className="flex flex-col">
       <ChatChannelCard roomId="123" />

@@ -1,4 +1,6 @@
+import { Metadata } from "next";
 import { Poppins as Font } from "next/font/google";
+import { Providers } from "~/components/providers";
 import { cn } from "~/lib/utils";
 import "./globals.css";
 
@@ -6,6 +8,10 @@ const font = Font({
   subsets: ["latin"],
   weight: ["500"],
 });
+
+export const metadata: Metadata = {
+  title: "Simple Chat",
+};
 
 export default function RootLayout({
   children,
@@ -21,7 +27,7 @@ export default function RootLayout({
           font.className
         )}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
