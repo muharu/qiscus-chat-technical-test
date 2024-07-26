@@ -9,7 +9,6 @@ export default async function Home() {
   return (
     <main className="flex flex-col">
       <ChatChannelCard roomId="123" />
-      <ChatChannelCard roomId="123" />
     </main>
   );
 }

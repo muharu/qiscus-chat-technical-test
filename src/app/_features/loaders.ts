@@ -3,7 +3,7 @@
 import jsonwebtoken from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-interface Auth {
+export interface Auth {
   exp: number;
   data: {
     id: string;
