@@ -14,13 +14,17 @@ export interface Auth {
 }
 
 export async function getAuth() {
-  const user = cookies().get("token")?.value;
+  try {
+    const user = cookies().get("token")?.value;
 
-  if (!user) {
+    if (!user) {
+      return null;
+    }
+
+    const decoded = jsonwebtoken.verify(user, "secret") as Auth;
+
+    return decoded.data;
+  } catch (error) {
     return null;
   }
-
-  const decoded = jsonwebtoken.verify(user, "secret") as Auth;
-
-  return decoded.data;
 }
