@@ -73,14 +73,23 @@ export function Chat({ user }: Readonly<{ user: Auth["data"] }>) {
               </video>
             )}
             {comment.type === "pdf" && (
-              <a
-                href={comment.message}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                View PDF
-              </a>
+              <div className="flex flex-col items-center overflow-hidden">
+                <iframe
+                  src={comment.message}
+                  title="PDF"
+                  className="rounded-lg hidden lg:flex"
+                  style={{ width: "100%", height: "300px" }}
+                ></iframe>
+                <a
+                  href={comment.message}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="lg:mt-2 underline"
+                >
+                  Download PDF
+                </a>
+              </div>
             )}
           </div>
         ))}
